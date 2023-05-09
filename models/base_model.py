@@ -11,9 +11,20 @@ class BaseModel:
 
     def __init__(self):
         """Instantiates a BaseModel object."""
-        self.id = str(uuid.uuid4())
-        self.created_at = datetime.now()
-        self.updated_at = datetime.now()
+        if kwargs:
+            for k, v in kwargs.items():
+                if k == "__class__":
+                    continue
+                elif k == "created_at":
+                    self.created_at = datetime.fromisoformat(v)
+                elif k == "updated_at":
+                    self.updated_at = datetime.fromisoformat(v)
+                else:
+                    setattr(self, k, v)
+        else:
+            self.id = str(uuid.uuid4())
+            self.created_at = datetime.now()
+            self.updated_at = datetime.now()
 
     def __str__(self):
         """Prints a string representaion of BaseModel"""
