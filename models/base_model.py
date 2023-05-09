@@ -9,17 +9,13 @@ from datetime import datetime
 class BaseModel:
     """This is the BaseModel class"""
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """Instantiates a BaseModel object."""
         if kwargs:
             for k, v in kwargs.items():
-                if k == "__class__":
-                    continue
-                elif k == "created_at":
-                    self.created_at = datetime.fromisoformat(v)
-                elif k == "updated_at":
-                    self.updated_at = datetime.fromisoformat(v)
-                else:
+                if k != "__class__":
+                    if k == "created_at" or k == "updated_at":
+                        v = datetime.fromisoformat(v)
                     setattr(self, k, v)
         else:
             self.id = str(uuid.uuid4())
