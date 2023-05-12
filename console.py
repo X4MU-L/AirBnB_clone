@@ -76,15 +76,19 @@ class HBNBCommand(cmd.Cmd):
         """Updates the value of a given object using the regex to get
         the values and keys"""
         # parse simple words, "complex", "more complex", number, float
-        args = re.findall(r'(\w.*?\s|\".*\s*?.*\"|\d+\.?\d{1,}?)', arg)
+        u = \
+            '([0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12})'
+        args = re.findall(
+            rf'((\d+(\.\d*))|{u}|\w.*?\b|\".*\s*?.*\")',
+            arg)
         try:
             # parsed args contains extra space on the end
-            key = args[2].split()[0]
+            key = args[2][0].split()[0]
         except IndexError:
             print("** attribute name missing **")
             return
         try:
-            value = args[3]
+            value = args[3][0]
             # test if it's a double string
             if len(value.split('"')) > 1:
                 # "double strings" fails on eval
