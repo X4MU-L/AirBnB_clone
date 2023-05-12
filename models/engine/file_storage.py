@@ -3,6 +3,7 @@
 
 import json
 from models.base_model import BaseModel
+from json.decoder import JSONDecodeError
 
 
 class FileStorage:
@@ -32,9 +33,12 @@ class FileStorage:
         """Deserializes the JSON file to __objects."""
         try:
             with open(FileStorage.__file_path) as f:
-                o_dict = json.load(f)
-                for v in o_dict.values():
-                    cls_name = v["__class__"]
-                    self.new(eval(cls_name)(**v))
+                try:
+                    o_dict = json.load(f)
+                    for v in o_dict.values():
+                        cls_name = v["__class__"]
+                        self.new(eval(cls_name)(**v))
+                except JSONDecodeError:
+                    pass
         except FileNotFoundError:
             return
