@@ -3,7 +3,13 @@
 
 import cmd
 import re
+from models.amenity import Amenity
 from models.base_model import BaseModel
+from models.city import City
+from models.place import Place
+from models.review import Review
+from models.state import State
+from models.user import User
 from models import storage
 
 
@@ -51,8 +57,8 @@ class HBNBCommand(cmd.Cmd):
         all_d = storage.all()
         if arg:
             try:
-                base = eval(arg.split()[0])()
-                if isinstance(base, BaseModel):
+                obj = eval(arg.split()[0])()
+                if isinstance(obj, BaseModel):
                     for k, v in all_d.items():
                         if k.split(".")[0] == arg.split()[0]:
                             print(v)
@@ -64,7 +70,7 @@ class HBNBCommand(cmd.Cmd):
             [print(v) for k, v in all_d.items()]
 
     def do_update(self, arg):
-        """Updates a BaseModel instance object, adds new or update attribute
+        """Updates an instance, adds new or update attribute
         e.g update <class_name> <class_id> <key> <value>"""
         obj = self.check_args(arg, self.get_object)
         if obj:
@@ -76,8 +82,8 @@ class HBNBCommand(cmd.Cmd):
         """Updates the value of a given object using the regex to get
         the values and keys"""
         # parse simple words, "complex", "more complex", number, float
-        u = \
-            '([0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12})'
+        u = '([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-\
+        [0-9a-fA-F]{12})'
         args = re.findall(
             rf'((\d+(\.\d*))|{u}|\w.*?\b|\".*\s*?.*\")',
             arg)
