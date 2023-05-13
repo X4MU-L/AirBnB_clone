@@ -2,7 +2,13 @@
 """Defines a FileStorage Class."""
 
 import json
+from models.amenity import Amenity
 from models.base_model import BaseModel
+from models.city import City
+from models.place import Place
+from models.review import Review
+from models.state import State
+from models.user import User
 from json.decoder import JSONDecodeError
 
 
@@ -10,6 +16,15 @@ class FileStorage:
     """Represents a FileStorage object/instance."""
     __objects = {}
     __file_path = "file.json"
+    __valid_classes = {
+        "Amenity",
+        "BaseModel",
+        "City",
+        "Place",
+        "State",
+        "User",
+        "Review"
+    }
 
     def all(self):
         """Returns the dictionary __objects."""
@@ -37,7 +52,8 @@ class FileStorage:
                     o_dict = json.load(f)
                     for v in o_dict.values():
                         cls_name = v["__class__"]
-                        self.new(eval(cls_name)(**v))
+                        if cls_name in FileStorage.__valid_classes:
+                            self.new(eval(cls_name)(**v))
                 except JSONDecodeError:
                     pass
         except FileNotFoundError:
