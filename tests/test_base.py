@@ -1,22 +1,55 @@
 #!/usr/bin/env python3
 """Unittest for testing the BaseModel class."""
 
+import models
 import unittest
 from datetime import datetime
 from models.base_model import BaseModel
 
 
-class Test_Instantiation(unittest.TestCase):
+class TestBase_Instantiation(unittest.TestCase):
     """Unittest for testing the functionalities of the Basemodel class."""
     def test_instantiation_without_arg(self):
         base = BaseModel()
         self.assertIsInstance(base, BaseModel)
+
+    def test_new_instance_in_objects(self):
+        base = BaseModel()
+        id = base.id
+        key = "BaseModel.{}".format(id)
+        self.assertIn(key, models.storage.all().keys())
+        self.assertIn(base, models.storage.all().values())
 
     def test_instantiation_from_dict(self):
         date = "2023-05-09T00:00:00.000000"
         d = {'id': 8998, 'updated_at': date, 'created_at': date}
         base = BaseModel(**d)
         self.assertIsInstance(base, BaseModel)
+
+    def test_unique_ids(self):
+        base = BaseModel()
+        base_2 = BaseModel()
+        self.assertNotEqual(base_2.id, base.id)
+
+    def test_base_created_at_difference(self):
+        """Test that creation time of two users is different"""
+        base = BaseModel()
+        base_2 = BaseModel()
+        self.assertLess(base.created_at, base_2.created_at)
+
+    def test_base_updated_at_difference(self):
+        """Test that the updated_at of two users are different"""
+        base = BaseModel()
+        base_2 = BaseModel()
+        self.assertLess(base.updated_at, base_2.updated_at)
+
+    def test_base_str_repr(self):
+        base = BaseModel()
+        base.id = "101010"
+        date = datetime.now()
+        base.created_at = base.updated_at = date
+        base_str = f"[BaseModel] ({base.id}) {base.__dict__}"
+        self.assertEqual(base_str, str(base))
 
     def test_pass_args_with_kwargs(self):
         d = {'id': '06af571e-a3de-478a-b6f0-ba0a9cffe0b0',
@@ -60,17 +93,7 @@ class Test_Instantiation(unittest.TestCase):
         self.assertEqual(date, base.updated_at)
 
 
-class Test_String_Rep(unittest.TestCase):
-    """Unittest for testing the string representation of a
-       BaseModel object."""
-    def test_str(self):
-        base = BaseModel()
-        result = "[{}] ({}) {}".format(type(base).__name__, base.id,
-                                       base.__dict__)
-        self.assertEqual(result, str(base))
-
-
-class Test_Save(unittest.TestCase):
+class TestBase_Save(unittest.TestCase):
     """Unittest to testing the public save method."""
     def test_attr_value_after_save(self):
         base = BaseModel()
@@ -83,7 +106,7 @@ class Test_Save(unittest.TestCase):
         self.assertNotEqual(updated_at, base.updated_at)
 
 
-class Test_Dict_Rep(unittest.TestCase):
+class TestBase_Dict(unittest.TestCase):
     """Unittest for testing the to_dict() public method."""
     def test_to_dict_method_returns(self):
         base = BaseModel()

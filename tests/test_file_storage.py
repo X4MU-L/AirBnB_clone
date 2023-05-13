@@ -1,29 +1,27 @@
 #!/usr/bin/python3
-"""The unnittest for FileStorage"""
+"""Unittest for testing the functionality of the FileStorage class"""
+
 import unittest
 from models import storage
 from models.engine.file_storage import FileStorage
 from models.base_model import BaseModel
 
 
-class Test_Storage_Instantiation(unittest.TestCase):
+class TestStorage_Instantiation(unittest.TestCase):
+    """Unittests for testing the instantiation of a Storage object."""
 
-    # create a setUp create and get a file for use
     @staticmethod
     def clear_file():
         file = open("file.json", "w")
         file.close()
 
-    # check if is of FileStorage Class
     def test_check_for_instantiation(self):
         self.assertIsInstance(storage, FileStorage)
 
-    # check instantiation with argument - should give ValueError
     def test_instance_of_filestorage_with_args(self):
         with self.assertRaises(TypeError):
-            FileStorage({"id": 12, "created_at": "2023-05-09T00:00:00.000000"})
+            FileStorage(None)
 
-    # check for if private attributes are private
     def test_for_private_value(self):
         with self.assertRaises(AttributeError):
             FileStorage.__objects

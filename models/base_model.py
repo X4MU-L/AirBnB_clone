@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Thisis the BaseModel Module"""
+"""Defines the BaseModel Model"""
 
 import models
 import re
@@ -8,10 +8,18 @@ from datetime import datetime
 
 
 class BaseModel:
-    """This is the BaseModel class"""
+    """Represents a BaseModel object."""
 
     def __init__(self, *args, **kwargs):
-        """Instantiates a BaseModel object."""
+        """Instantiates a BaseModel object.
+
+        Args:
+            args (any): ...
+            kwargs (dict): A dictionary argument.
+        """
+        self.id = str(uuid4())
+        self.created_at = datetime.now()
+        self.updated_at = datetime.now()
         if kwargs:
             for k, v in kwargs.items():
                 if k != "__class__":
@@ -19,9 +27,6 @@ class BaseModel:
                         v = datetime.fromisoformat(v)
                     setattr(self, k, v)
         else:
-            self.id = str(uuid4())
-            self.created_at = datetime.now()
-            self.updated_at = datetime.now()
             models.storage.new(self)
 
     def __str__(self):
@@ -42,4 +47,5 @@ class BaseModel:
             for key, value in inst_dict.items()
         }
         inst_dict["__class__"] = type(self).__name__
+
         return (inst_dict)
