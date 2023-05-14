@@ -169,6 +169,11 @@ class TestReview_to_dict(unittest.TestCase):
         with self.assertRaises(TypeError):
             self.review.to_dict(None)
 
+    def test_to_dict_return_value_not_same_as_self_dict(self):
+        review = Review()
+        d = review.to_dict()
+        self.assertNotEqual(d, review.__dict__)
+
 
 if __name__ == "__main__":
     unittest.main()

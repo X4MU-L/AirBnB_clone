@@ -174,6 +174,11 @@ class TestAmenity_to_dict(unittest.TestCase):
         with self.assertRaises(TypeError):
             self.amenity.to_dict(None)
 
+    def test_to_dict_return_value_not_same_as_self_dict(self):
+        amenity = Amenity()
+        d = amenity.to_dict()
+        self.assertNotEqual(d, amenity.__dict__)
+
 
 if __name__ == "__main__":
     unittest.main()

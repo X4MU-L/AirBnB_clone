@@ -134,6 +134,11 @@ class TestBaseModel_dict(unittest.TestCase):
         base = BaseModel(**d)
         self.assertEqual(base.to_dict(), d)
 
+    def test_to_dict_return_value_not_same_as_self_dict(self):
+        base = BaseModel()
+        d = base.to_dict()
+        self.assertNotEqual(d, base.__dict__)
+
 
 if __name__ == "__main__":
     unittest.main()
