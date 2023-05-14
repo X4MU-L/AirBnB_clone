@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Defines a command line interpreter."""
 
 import cmd
@@ -12,6 +12,9 @@ from models.state import State
 from models.city import City
 from models.review import Review
 from models import storage
+from json.decoder import JSONDecodeError
+RG1 = r'\s*?[\"\']?(.*?)[\"\'],\s+?\"?\'?(\w+)\"?\'?,\s+?\"?\'?(\w+)\"?\'?'
+RG2 = r'\s*?(\w+)\s+?(.*?)?\s[\'\"]?(\w+)[\'\"]?\s+?[\'\"]?(.*)[\'\"]?'
 
 
 def get_sub_classes():
@@ -51,6 +54,8 @@ class HBNBCommand(cmd.Cmd):
 
     def do_create(self, arg):
         """Creates a new instance of a class, saves it, and prints the id."""
+        if arg and arg != "()":
+            try:
         if arg:
             if arg.split()[0] in HBNBCommand.__classes:
                 base = eval(arg.split()[0])()
@@ -105,23 +110,22 @@ class HBNBCommand(cmd.Cmd):
         """Updates the value of a given object using the regex to get
         the values and keys"""
         # parse simple words, "complex", "more complex", number, float
-        # !TODO - refactor regex
-        val_pat \
-            = r'\s*?[\"\']?(.*?)[\"\'],\s+?\"?\'?(\w+)\"?\'?,\s+?\"?\'?(\w+)\"?\'?'
+        not_allowed = ["created_at", "updated_at", "id"]
         if (type(args) == tuple and not args[2] and type(args[2]) == int):
             pattern = r'\s*?[\"\']?(.*)?[\"\'],\s+?\"?\'?(\w+)\"?\'?'
             match_atr = re.match(pattern, args[1])
             if match_atr:
                 ar = list(match_atr.groups())[1:]
                 if ar:
-                    match_val = re.match(val_pat, args[1])
+                    match_val = re.match(RG1, args[1])
                     if match_val:
                         id, key, value = match_val.groups()
                         try:
                             val = HBNBCommand.valtype(value)(value)
                         except SyntaxError:
                             pass
-                        setattr(obj, key, val)
+                        if key not in not_allowed:
+                            setattr(obj, key, val)
                         return
                     else:
                         print("** value missing **")
@@ -133,45 +137,40 @@ class HBNBCommand(cmd.Cmd):
             return
 
         if (type(args) == tuple and args[3]):
+            new_dict = ''
+            for c in args[2]:
+                if c == "'":
+                    new_dict += '"'
+                    continue
+                new_dict += c
             try:
-                _dict = json.loads(args[2])
+                _dict = json.loads(new_dict)
                 if _dict:
-                    for key, val in _dict.items():
-                        setattr(obj, key, val)
-                    return
+                    [
+                        setattr(obj, k, _dict[k]) for k in _dict.keys()
+                        if k not in not_allowed
+                    ]
+                    obj.save()
                 else:
                     print("** attribute name missing **")
-                    return
-            except Exception as e:
-                print(f"[Exception] {e.args}")
-                return
+            except JSONDecodeError:
+                print("** value missing **")
         else:
-            # !TODO - STILL NEEDS REFACTORING - UNEXPECTED RESULT IF
-            # TOO MAY ARGS
-            arg = re.match(r"\s*?(\w+)\s+?(.*?)?\s(\w+)", args)
+            arg = re.match(r"\s*?(\w+)\s+?(.*?)?\s[\'\"]?(\w+)[\'\"]?",
+                           args)
             if arg:
-                arg2 = re.match(r"\s*?(\w+)\s+?(.*?)?\s(\w+)\s+?(.*)?", args)
+                arg2 = re.match(RG2, args)
                 if arg2:
-                    print(arg2.groups())
                     cls, id, key, values = arg2.groups()
                     # test if it's a double quoted string
-                    val = re.match(r"\s*?[\'\"]?(\S+)[\'\"]|^\d+?\.?\d{1,}$",
-                                   values)
-                    try:
-                        val = val.groups()
-                        val = val[0]
-                    except AttributeError:
-                        val = values.split('"')
-                        val = val[1]
-                    if val is None:
-                        val = values.split()
-                        val = val[0]
+                    val = values.split('"')[0]
                     try:
                         val = HBNBCommand.valtype(val)(val)
                     except SyntaxError:
                         pass
-                    setattr(obj, key, val)
-                    obj.save()
+                    if key not in not_allowed:
+                        setattr(obj, key, val)
+                        obj.save()
                 else:
                     print("** value missing **")
             else:
@@ -215,8 +214,14 @@ class HBNBCommand(cmd.Cmd):
     @staticmethod
     def check_args(arg, func):
         """parses and checks the needed argument to a function"""
+        func_fail = [HBNBCommand.delete_arg, HBNBCommand.printing]
+
+        if arg == "()" and func in func_fail:
+            print("** class name missing **")
+            return
         arg = arg.split()
         arg_len = len(arg)
+
         if arg_len < 1:
             print("** class name missing **")
             return
@@ -281,7 +286,6 @@ class HBNBCommand(cmd.Cmd):
                 else:
                     ma[2] = '"' + ma[2][:]
                 cls, func, args = ma
-                print(ma)
                 ar = f"{cls} {args}"
                 if func in func_dict and func != "update":
                     func_dict[func](ar)
