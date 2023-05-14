@@ -55,8 +55,6 @@ class HBNBCommand(cmd.Cmd):
     def do_create(self, arg):
         """Creates a new instance of a class, saves it, and prints the id."""
         if arg and arg != "()":
-            try:
-        if arg:
             if arg.split()[0] in HBNBCommand.__classes:
                 base = eval(arg.split()[0])()
                 base.save()
