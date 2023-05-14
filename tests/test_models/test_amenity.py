@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
+"""Unittests for testing the Amenity class."""
 
 import models
 import unittest
@@ -9,7 +10,7 @@ from models.base_model import BaseModel
 from time import sleep
 
 
-class TestUser_Instantiation(unittest.TestCase):
+class TestAmenity_Instantiation(unittest.TestCase):
     """Unittest for testing the attributes of the Amenity class"""
     amenity = Amenity()
 
@@ -74,7 +75,7 @@ class TestUser_Instantiation(unittest.TestCase):
             Amenity(id=None, created_at=None)
 
 
-class TestUser_save(unittest.TestCase):
+class TestAmenity_save(unittest.TestCase):
     """Unittest for testing the save() method."""
     amenity = Amenity()
 
@@ -115,7 +116,7 @@ class TestUser_save(unittest.TestCase):
             self.amenity.save(None)
 
 
-class TestUser_to_dict(unittest.TestCase):
+class TestAmenity_to_dict(unittest.TestCase):
     amenity = Amenity()
 
     def test_to_dict_type(self):
@@ -172,6 +173,11 @@ class TestUser_to_dict(unittest.TestCase):
     def test_to_dict_with_args(self):
         with self.assertRaises(TypeError):
             self.amenity.to_dict(None)
+
+    def test_to_dict_return_value_not_same_as_self_dict(self):
+        amenity = Amenity()
+        d = amenity.to_dict()
+        self.assertNotEqual(d, amenity.__dict__)
 
 
 if __name__ == "__main__":

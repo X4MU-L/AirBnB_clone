@@ -56,10 +56,12 @@ class HBNBCommand(cmd.Cmd):
         """Creates a new instance of a class, saves it, and prints the id."""
         if arg and arg != "()":
             try:
+        if arg:
+            if arg.split()[0] in HBNBCommand.__classes:
                 base = eval(arg.split()[0])()
                 base.save()
                 print(base.id)
-            except NameError:
+            else:
                 print("** class doesn't exist **")
         else:
             print("** class name missing **")

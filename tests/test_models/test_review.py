@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 """Unittests for testing the Review class."""
 
 import models
@@ -168,6 +168,11 @@ class TestReview_to_dict(unittest.TestCase):
     def test_to_dict_with_args(self):
         with self.assertRaises(TypeError):
             self.review.to_dict(None)
+
+    def test_to_dict_return_value_not_same_as_self_dict(self):
+        review = Review()
+        d = review.to_dict()
+        self.assertNotEqual(d, review.__dict__)
 
 
 if __name__ == "__main__":

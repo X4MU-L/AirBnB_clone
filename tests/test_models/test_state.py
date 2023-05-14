@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
+"""Unittests for testing the State class."""
 
 import models
 import unittest
@@ -9,7 +10,7 @@ from models.base_model import BaseModel
 from time import sleep
 
 
-class TestPlace_Instantiation(unittest.TestCase):
+class TestState_Instantiation(unittest.TestCase):
     """Unittest for testing the instantiation of a State object."""
     state = State()
 
@@ -68,7 +69,7 @@ class TestPlace_Instantiation(unittest.TestCase):
             State(id=None, created_at=None)
 
 
-class TestPlace_save(unittest.TestCase):
+class TestState_save(unittest.TestCase):
     """Unittest for testing the save() method."""
     state = State()
 
@@ -109,7 +110,7 @@ class TestPlace_save(unittest.TestCase):
             self.state.save(None)
 
 
-class TestPlace_to_dict(unittest.TestCase):
+class TestState_to_dict(unittest.TestCase):
     """Unittest for testing the to_dict() method."""
     state = State()
 
@@ -167,6 +168,11 @@ class TestPlace_to_dict(unittest.TestCase):
     def test_to_dict_with_args(self):
         with self.assertRaises(TypeError):
             self.state.to_dict(None)
+
+    def test_to_dict_return_value_not_same_as_self_dict(self):
+        state = State()
+        d = state.to_dict()
+        self.assertNotEqual(d, state.__dict__)
 
 
 if __name__ == "__main__":
