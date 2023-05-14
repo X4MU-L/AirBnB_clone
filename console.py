@@ -74,7 +74,7 @@ class HBNBCommand(cmd.Cmd):
         """Prints all the BaseModel instance created"""
         all_d = storage.all()
         if arg and arg != "()":
-            if arg[0].split()[0] in HBNBCommand.__classes:
+            if arg.split()[0] in HBNBCommand.__classes:
                 for k, v in all_d.items():
                     if k.split(".")[0] == arg.split()[0]:
                         print(v)
