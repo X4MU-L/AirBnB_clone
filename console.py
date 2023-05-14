@@ -1,21 +1,27 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Defines a command line interpreter."""
 
 import cmd
 import re
-from models.amenity import Amenity
+import json
 from models.base_model import BaseModel
-from models.city import City
-from models.place import Place
-from models.review import Review
-from models.state import State
 from models.user import User
+from models.amenity import Amenity
+from models.place import Place
+from models.state import State
+from models.city import City
+from models.review import Review
 from models import storage
+
+
+def get_sub_classes():
+    """Gets the subclasses of BaseModel"""
+    return [cl.__name__ for cl in BaseModel.__subclasses__()]
 
 
 class HBNBCommand(cmd.Cmd):
     """HBNBCommand is a command line interpreter"""
-
+    __classes = ["BaseModel", *get_sub_classes()]
     prompt = "(hbnb) "
 
     def do_quit(self, arg):
@@ -31,8 +37,20 @@ class HBNBCommand(cmd.Cmd):
         """Does nothing."""
         pass
 
+    def do_count(self, arg):
+        """Counts instances of a class"""
+        all_inst = storage.all()
+        counts = 0
+        if arg and arg != "()":
+            for key in all_inst.keys():
+                if arg.split()[0] in key:
+                    counts += 1
+            print(counts)
+        else:
+            print(len(all_inst))
+
     def do_create(self, arg):
-        """Creates a new instance of BaseModel, saves it, and prints the id."""
+        """Creates a new instance of a class, saves it, and prints the id."""
         if arg:
             try:
                 base = eval(arg.split()[0])()
@@ -55,56 +73,109 @@ class HBNBCommand(cmd.Cmd):
     def do_all(self, arg):
         """Prints all the BaseModel instance created"""
         all_d = storage.all()
-        if arg:
-            try:
-                obj = eval(arg.split()[0])()
-                if isinstance(obj, BaseModel):
-                    for k, v in all_d.items():
-                        if k.split(".")[0] == arg.split()[0]:
-                            print(v)
-                else:
-                    print("** class doesn't exist **")
-            except NameError:
+        if arg and arg != "()":
+            if arg[0].split()[0] in HBNBCommand.__classes:
+                for k, v in all_d.items():
+                    if k.split(".")[0] == arg.split()[0]:
+                        print(v)
+            else:
                 print("** class doesn't exist **")
         else:
             [print(v) for k, v in all_d.items()]
 
     def do_update(self, arg):
-        """Updates an instance, adds new or update attribute
+        """Updates a BaseModel instance object, adds new or update attribute
         e.g update <class_name> <class_id> <key> <value>"""
-        obj = self.check_args(arg, self.get_object)
-        if obj:
-            # update the value of object
-            self.run_update(obj, arg)
+        if type(arg) != tuple:
+            obj = self.check_args(arg, self.get_object)
+            if obj:
+                # update the value of object
+                self.run_update(obj, arg)
+                return
+        elif type(arg) == tuple:
+            ar = f"{arg[0]} {arg[1]}"
+            obj = self.check_args(ar, self.get_object)
+            if obj:
+                # update the value of object
+                self.run_update(obj, arg)
+                return
 
     @staticmethod
-    def run_update(obj, arg):
+    def run_update(obj, args):
         """Updates the value of a given object using the regex to get
         the values and keys"""
         # parse simple words, "complex", "more complex", number, float
-        u = '([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-\
-        [0-9a-fA-F]{12})'
-        args = re.findall(
-            rf'((\d+(\.\d*))|{u}|\w.*?\b|\".*\s*?.*\")',
-            arg)
-        try:
-            # parsed args contains extra space on the end
-            key = args[2][0].split()[0]
-        except IndexError:
+        # !TODO - refactor regex
+        val_pat \
+            = r'\s*?[\"\']?(.*?)[\"\'],\s+?\"?\'?(\w+)\"?\'?,\s+?\"?\'?(\w+)\"?\'?'
+        if (type(args) == tuple and not args[2] and type(args[2]) == int):
+            pattern = r'\s*?[\"\']?(.*)?[\"\'],\s+?\"?\'?(\w+)\"?\'?'
+            match_atr = re.match(pattern, args[1])
+            if match_atr:
+                ar = list(match_atr.groups())[1:]
+                if ar:
+                    match_val = re.match(val_pat, args[1])
+                    if match_val:
+                        id, key, value = match_val.groups()
+                        try:
+                            val = HBNBCommand.valtype(value)(value)
+                        except SyntaxError:
+                            pass
+                        setattr(obj, key, val)
+                        return
+                    else:
+                        print("** value missing **")
+                        return
+                else:
+                    print("** attribute name missing **")
+                    return
             print("** attribute name missing **")
             return
-        try:
-            value = args[3][0]
-            # test if it's a double string
-            if len(value.split('"')) > 1:
-                # "double strings" fails on eval
-                value = value.split('"')[1]
+
+        if (type(args) == tuple and args[3]):
+            try:
+                _dict = json.loads(args[2])
+                if _dict:
+                    for key, val in _dict.items():
+                        setattr(obj, key, val)
+                    return
+                else:
+                    print("** attribute name missing **")
+                    return
+            except Exception as e:
+                print(f"{e.args}")
+                return
+        else:
+            # !TODO - STILL NEEDS REFACTORING - UNEXPECTED RESULT IF
+            # TOO MAY ARGS
+            arg = re.match(r"\s*?(\w+)\s+?(.*?)?\s(\w+)", args)
+            if arg:
+                arg2 = re.match(r"\s*?(\w+)\s+?(.*?)?\s(\w+)\s+?(.*)?", args)
+                if arg2:
+                    print(arg2.groups())
+                    cls, id, key, values = arg2.groups()
+                    # test if it's a double quoted string
+                    val = re.match(r"\s*?[\'\"]?(\S+)[\'\"]|^\d+?\.?\d{1,}$",
+                                   values)
+                    try:
+                        val = val.groups()
+                        val = val[0]
+                    except AttributeError:
+                        val = values.split('"')
+                        val = val[1]
+                    if val is None:
+                        val = values.split()
+                        val = val[0]
+                    try:
+                        val = HBNBCommand.valtype(val)(val)
+                    except SyntaxError:
+                        pass
+                    setattr(obj, key, val)
+                    obj.save()
+                else:
+                    print("** value missing **")
             else:
-                value = HBNBCommand.valtype(value)(value)
-            setattr(obj, key, value)
-            obj.save()
-        except IndexError:
-            print("** value missing **")
+                print("** attribute name missing **")
 
     @staticmethod
     def valtype(arg):
@@ -117,18 +188,29 @@ class HBNBCommand(cmd.Cmd):
     @staticmethod
     def get_object(arg):
         """retrieves the object to update"""
-        return (storage.all()[f"{arg[0]}.{arg[1]}"])
+        id = re.match(r'[\"\']?([^\"\']+)[\'\"]?', arg[1])
+        if id:
+            return (storage.all()[f"{arg[0]}.{id.groups()[0]}"])
+        raise KeyError
 
     @staticmethod
     def printing(arg):
         """prints a given object"""
-        print(storage.all()[f"{arg[0]}.{arg[1]}"])
+        id = re.match(r'[\"\']?([^\"\']+)[\'\"]?', arg[1])
+        if id:
+            print(storage.all()[f"{arg[0]}.{id.groups()[0]}"])
+            return
+        raise KeyError
 
     @staticmethod
     def delete_arg(arg):
         """deletes an object and update storage"""
-        del storage.all()[f"{arg[0]}.{arg[1]}"]
-        storage.save()
+        id = re.match(r'[\"\']?([^\"\']+)[\'\"]?', arg[1])
+        if id:
+            del storage.all()[f"{arg[0]}.{id.groups()[0]}"]
+            storage.save()
+            return
+        raise KeyError
 
     @staticmethod
     def check_args(arg, func):
@@ -138,20 +220,92 @@ class HBNBCommand(cmd.Cmd):
         if arg_len < 1:
             print("** class name missing **")
             return
-        try:
-            base = eval(arg[0])()
-            if isinstance(base, BaseModel):
-                if arg_len < 2:
-                    print("** instance id missing **")
-                    return
-                try:
-                    return (func(arg))
-                except KeyError:
-                    print("** no instance found **")
-            else:
-                print("** class doesn't exist **")
-        except (TypeError, NameError):
+        if arg[0].split()[0] in HBNBCommand.__classes:
+            if arg_len < 2:
+                print("** instance id missing **")
+                return
+            try:
+                return (func(arg))
+            except KeyError:
+                print("** no instance found **")
+        else:
             print("** class doesn't exist **")
+
+    def default(self, arg):
+        """Runs as default to functions not parsed by onecmd"""
+        func_dict = {
+            "all": self.do_all,
+            "show": self.do_show,
+            "update": self.do_update,
+            "count": self.do_count,
+            "create": self.do_create,
+            "destroy": self.do_destroy,
+            "quit": self.do_quit,
+        }
+        match_dict = re.match(
+            r'\s*?(\w+)\.(\w+)\([\"\'](.*)[\"\'],\s+?({(.*?)})\)', arg)
+        if match_dict is None:
+            match_no_args = re.match(r"\s*?(\w+)\.(\w+)\(\)", arg)
+            if match_no_args:
+                cls, func = match_no_args.groups()
+                if func in func_dict:
+                    func_dict[func](cls)
+                    return False
+                else:
+                    print(f"** Invalid syntax ** {arg}")
+                    return False
+            matchid = re.match(r"\s*?(\w+)\.(\w+)\([\"\']([^\"\']*)[\'\"]\)",
+                               arg)
+            if matchid:
+                cls, func, id = matchid.groups()
+                ar = f"{cls} {id}"
+                if func in func_dict and func != "update":
+                    func_dict[func](ar)
+                    return False
+                elif func == "update":
+                    ar = cls, id, 0
+                    func_dict[func](ar)
+                    return False
+                else:
+                    print(f"** Invalid syntax ** {arg}")
+                    return False
+
+            match_update = re.match(r"\s*?(\w+)\.(\w+)\([\"\'](.*?)[\"\']\)",
+                                    arg)
+            if match_update:
+                ma = match_update.groups()
+                ma = list(ma)
+                first = ma[2].split(", ")[0]
+                if first[len(first) - 1] == "'":
+                    ma[2] = "'" + ma[2][:]
+                else:
+                    ma[2] = '"' + ma[2][:]
+                cls, func, args = ma
+                print(ma)
+                ar = f"{cls} {args}"
+                if func in func_dict and func != "update":
+                    func_dict[func](ar)
+                    return False
+                elif func == "update":
+                    ar = cls, args, 0
+                    func_dict[func](ar)
+                    return False
+                else:
+                    print(f"** Invalid syntax ** {arg}")
+                    return False
+            else:
+                print(f"** Invalid syntax ** {arg}")
+                return False
+        else:
+            cls, func, id, _dict, k = match_dict.groups()
+            if func in func_dict and func == "update":
+                ar = f"{id} {_dict}"
+                ar = cls, id, _dict, 1
+                func_dict[func](ar)
+                return False
+
+            print(f"** Invalid syntax ** {arg}")
+            return False
 
 
 if __name__ == "__main__":
