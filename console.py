@@ -52,11 +52,11 @@ class HBNBCommand(cmd.Cmd):
     def do_create(self, arg):
         """Creates a new instance of a class, saves it, and prints the id."""
         if arg:
-            try:
+            if arg.split()[0] in HBNBCommand.__classes:
                 base = eval(arg.split()[0])()
                 base.save()
                 print(base.id)
-            except NameError:
+            else:
                 print("** class doesn't exist **")
         else:
             print("** class name missing **")
@@ -143,7 +143,7 @@ class HBNBCommand(cmd.Cmd):
                     print("** attribute name missing **")
                     return
             except Exception as e:
-                print(f"{e.args}")
+                print(f"[Exception] {e.args}")
                 return
         else:
             # !TODO - STILL NEEDS REFACTORING - UNEXPECTED RESULT IF
