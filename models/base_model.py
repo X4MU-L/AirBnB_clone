@@ -15,7 +15,7 @@ class BaseModel:
 
         Args:
             args (any): ...
-            kwargs (dict): A dictionary argument.
+            kwargs (dict): A dictionary containing attributes.
         """
         self.id = str(uuid4())
         self.created_at = datetime.now()
@@ -30,7 +30,7 @@ class BaseModel:
             models.storage.new(self)
 
     def __str__(self):
-        """Prints a string representaion of BaseModel"""
+        """Returns a string representaion of BaseModel"""
         return ("[{}] ({}) {}".format(type(self).__name__,
                                       self.id, self.__dict__))
 
@@ -41,11 +41,10 @@ class BaseModel:
 
     def to_dict(self):
         """Returns a dictionary representation of BaseModel instance"""
-        inst_dict = self.__dict__
+        inst_dict = self.__dict__.copy()
         inst_dict = {
             key: value.isoformat() if re.search('.*_at', key) else value
             for key, value in inst_dict.items()
         }
         inst_dict["__class__"] = type(self).__name__
-
         return (inst_dict)
