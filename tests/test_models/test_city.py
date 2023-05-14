@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
+"""Unittests for testing the City class."""
 
 import models
 import unittest
@@ -9,7 +10,7 @@ from models.base_model import BaseModel
 from time import sleep
 
 
-class TestPlace_Instantiation(unittest.TestCase):
+class TestCity_Instantiation(unittest.TestCase):
     """Unittest for testing the instantiation of a City object."""
     city = City()
 
@@ -70,7 +71,7 @@ class TestPlace_Instantiation(unittest.TestCase):
             City(id=None, created_at=None)
 
 
-class TestPlace_save(unittest.TestCase):
+class TestCity_save(unittest.TestCase):
     """Unittest for testing the save() method."""
     city = City()
 
@@ -111,7 +112,7 @@ class TestPlace_save(unittest.TestCase):
             self.city.save(None)
 
 
-class TestPlace_to_dict(unittest.TestCase):
+class TestCity_to_dict(unittest.TestCase):
     """Unittest for testing the to_dict() method."""
     city = City()
 

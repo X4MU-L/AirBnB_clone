@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 """Unittest for testing the BaseModel class."""
 
 import models
@@ -7,7 +7,7 @@ from datetime import datetime
 from models.base_model import BaseModel
 
 
-class TestBase_Instantiation(unittest.TestCase):
+class TestBaseModel_Instantiation(unittest.TestCase):
     """Unittest for testing the functionalities of the Basemodel class."""
     def test_instantiation_without_arg(self):
         base = BaseModel()
@@ -93,7 +93,7 @@ class TestBase_Instantiation(unittest.TestCase):
         self.assertEqual(date, base.updated_at)
 
 
-class TestBase_Save(unittest.TestCase):
+class TestBaseModel_save(unittest.TestCase):
     """Unittest to testing the public save method."""
     def test_attr_value_after_save(self):
         base = BaseModel()
@@ -106,7 +106,7 @@ class TestBase_Save(unittest.TestCase):
         self.assertNotEqual(updated_at, base.updated_at)
 
 
-class TestBase_Dict(unittest.TestCase):
+class TestBaseModel_dict(unittest.TestCase):
     """Unittest for testing the to_dict() public method."""
     def test_to_dict_method_returns(self):
         base = BaseModel()

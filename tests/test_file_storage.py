@@ -7,7 +7,7 @@ from models.engine.file_storage import FileStorage
 from models.base_model import BaseModel
 
 
-class TestStorage_Instantiation(unittest.TestCase):
+class TestFileStorage_Instantiation(unittest.TestCase):
     """Unittests for testing the instantiation of a Storage object."""
 
     @staticmethod
