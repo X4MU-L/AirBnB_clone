@@ -189,6 +189,11 @@ class TestPlace_to_dict(unittest.TestCase):
         with self.assertRaises(TypeError):
             self.place.to_dict(None)
 
+    def test_to_dict_return_value_not_same_as_self_dict(self):
+        place = Place()
+        d = place.to_dict()
+        self.assertNotEqual(d, place.__dict__)
+
 
 if __name__ == "__main__":
     unittest.main()
