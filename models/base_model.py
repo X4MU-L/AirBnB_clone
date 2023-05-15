@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 """Defines the BaseModel Model"""
-
 import models
 import re
 from uuid import uuid4
