@@ -1,0 +1,32 @@
+/* style places */
+
+.places {
+  margin-top: 20px;
+}
+
+.places h1 {
+  font-weight: 700;
+  font-size: 30px;
+}
+
+.places .places-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.places article {
+  width: 390px;
+  padding: 20px;
+  margin: 20px;
+  border: #ff5a5f 1px solid;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.places h2 {
+  font-weight: 700;
+  font-size: 30px;
+}
