@@ -1,0 +1,60 @@
+/* Filers Styles */
+
+.filters {
+  position: relative;
+  background-color: white;
+  display: flex;
+  height: 70px;
+  width: 100%;
+  border: solid 1px #dddddd;
+  border-radius: 4px;
+}
+/* style button in filter */
+.filters button {
+  position: absolute;
+  font-size: 18px;
+  background-color: #ff5a5f;
+  color: #ffffff;
+  height: 48px;
+  width: 20%;
+  border: none;
+  border-radius: 4px;
+  right: 0;
+  top: 50%;
+  transform: translate(-30px, -50%);
+}
+/* style hover of button */
+.filters button:hover {
+  opacity: 0.9;
+}
+
+/* style h3 and h4 */
+.filters h3 {
+  margin: 0;
+  font-weight: 600;
+}
+.filters h4 {
+  margin: 0;
+  font-weight: 400;
+  font-size: 14px;
+}
+
+/* style location div */
+.locations {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 25%;
+  height: 100%;
+  border-right: solid 1px #dddddd;
+  margin-left: 30px;
+}
+
+/* style amenities ddiv */
+.amenities {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 25%;
+  margin-left: 30px;
+}
