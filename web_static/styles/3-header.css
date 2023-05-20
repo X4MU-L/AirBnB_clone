@@ -1,0 +1,14 @@
+header {
+  box-sizing: border-box;
+  background-color: white;
+  height: 70px;
+  width: 100%;
+  padding-inline: 20px;
+  border-bottom: solid 1px #cccccc;
+}
+.logo {
+  background-image: url("/images/logo.png");
+  background-position: left;
+  background-repeat: no-repeat;
+  height: 100%;
+}
