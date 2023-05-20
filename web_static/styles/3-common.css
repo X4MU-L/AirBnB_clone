@@ -7,3 +7,10 @@ body {
   font-size: 14px;
   font-family: "Circular", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
+
+/* container styles */
+.container {
+  max-width: 1000px;
+  width: 100%;
+  margin: 30px auto;
+}
