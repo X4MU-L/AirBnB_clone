@@ -55,6 +55,7 @@
 .popover {
   position: absolute;
   box-sizing: border-box;
+  z-index: 2;
   top: 100%;
   right: 0;
   left: 0;

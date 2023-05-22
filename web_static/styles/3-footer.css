@@ -5,7 +5,7 @@ footer {
   height: 60px;
   width: 100%;
   border-top: solid 1px #cccccc;
-  position: absolute;
+  align-self: flex-end;
   bottom: 0;
   display: flex;
   justify-content: center;
