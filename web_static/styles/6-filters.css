@@ -41,8 +41,8 @@
 .locations {
   border-right: solid 1px #dddddd;
 }
-.locations,
-.amenities {
+.filters > .locations,
+.filters > .amenities {
   display: flex;
   flex-direction: column;
   justify-content: center;
