@@ -1,0 +1,20 @@
+/* Header styles */
+
+header {
+  box-sizing: border-box;
+  background-image: url("/images/logo.png");
+  background-repeat: no-repeat;
+  background-position: 20px;
+  background-color: white;
+  height: 70px;
+  width: 100%;
+  border-bottom: solid 1px #cccccc;
+}
+
+@media (max-width: 390px) {
+  header {
+    background-size: contain;
+    background-position: 15px;
+    height: 50px;
+  }
+}
